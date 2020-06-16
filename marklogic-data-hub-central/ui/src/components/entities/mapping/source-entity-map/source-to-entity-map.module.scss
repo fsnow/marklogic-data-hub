@@ -36,21 +36,32 @@
     word-break: break-all;
 }
 
-.sourceTable {
-    & thead > tr > th {
+.sourceTable{
+      & thead > tr > th {
         background-color: #fafafa;
         line-height: 2px;
-      };
-    & tbody > tr > td {
+      };  
+      & tbody > tr > td {
         line-height: 2px;
     }
 }
+
+// .filteredSourceTable{
+//     & thead > tr > :first-child {
+//         background-image: linear-gradient(#394494, #394494);
+//         // background-repeat: no-repeat;
+//         // background-size: 15%;
+//         // background-position: 230px 0px;
+//         }
+//     }
+
+
 .sourceTableRows{
     line-height: 1px;
 }
 
 .filterContainer {
-    padding: 8px
+    padding: 8px;
 }
 .searchInput {
     min-width: 8vw;
