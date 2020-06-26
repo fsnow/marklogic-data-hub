@@ -13,7 +13,7 @@ import Run from './Run';
 import Browse from './Browse';
 import { AuthoritiesContext } from "../util/authorities";
 import { SearchContext } from '../util/search-context';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 
 export type TileId = 'load' | 'model' | 'curate' | 'run' | 'explore';
 export type IconType = 'fa' | 'custom';
@@ -41,6 +41,9 @@ const TilesView = (props) => {
     const [currentNode, setCurrentNode] = useState<any>(INITIAL_SELECTION);
     const [options, setOptions] = useState<TileItem|null>(null);
 
+    const history: any = useHistory();
+    const location: any = useLocation();
+
     const {
         setZeroState,
         setManageQueryModal,
@@ -57,6 +60,7 @@ const TilesView = (props) => {
         setCurrentNode(INITIAL_SELECTION); // TODO Handle multiple with nested objects
         setOptions(null);
         setView(null);
+        history.push('/tiles');
     }
 
     // For role-based privileges
@@ -80,8 +84,6 @@ const TilesView = (props) => {
         setView(views[id]);
     }
 
-    const location: any = useLocation();
-
     useEffect(() => {
         if (props.id) {
             setSelection(props.id);
@@ -97,13 +99,24 @@ const TilesView = (props) => {
         })
     }, [])
 
-    const [newStepToFlowOptions, setNewStepToFlowOptions] = useState(!props.id ? { addingStepToFlow: false } : {
-        addingStepToFlow: true,
-        newStepName: location.state?.stepToAdd,
-        stepDefinitionType: location.state?.stepDefinitionType,
-        existingFlow: location.state?.existingFlow || false,
-        flowsDefaultKey: location.state?.flowsDefaultKey || ['-1']
-    })
+    const getNewStepToFlowOptions = () => {
+        return !props.addingStepToFlow ? { addingStepToFlow: false } : {
+            addingStepToFlow: true,
+            newStepName: location.state?.stepToAdd,
+            stepDefinitionType: location.state?.stepDefinitionType,
+            existingFlow: location.state?.existingFlow || false,
+            flowsDefaultKey: location.state?.flowsDefaultKey || ['-1']
+        }
+    }
+
+    //const [newStepToFlowOptions, setNewStepToFlowOptions] = useState({ addingStepToFlow: false });
+    // const [newStepToFlowOptions, setNewStepToFlowOptions] = useState(!props.addingStepToFlow ? { addingStepToFlow: false } : {
+    //     addingStepToFlow: true,
+    //     newStepName: location.state?.stepToAdd,
+    //     stepDefinitionType: location.state?.stepDefinitionType,
+    //     existingFlow: location.state?.existingFlow || false,
+    //     flowsDefaultKey: location.state?.flowsDefaultKey || ['-1']
+    // })
 
     return (
         <>
@@ -118,7 +131,7 @@ const TilesView = (props) => {
                         options={options}
                         onMenuClick={onMenuClick}
                         onTileClose={onTileClose}
-                        newStepToFlowOptions={newStepToFlowOptions}
+                        newStepToFlowOptions={getNewStepToFlowOptions()}
                     />
                     ) : null }
                 </div> ) :

@@ -35,7 +35,7 @@ describe('Tiles View component tests for Developer user', () => {
         cleanup();
     })
 
-    test('Verify TilesView renders with the toolbar', async () => {
+    xtest('Verify TilesView renders with the toolbar', async () => {
         const { getByLabelText } = render(<Router history={history}>
             <AuthoritiesContext.Provider value={mockDevRolesService}><TilesView/></AuthoritiesContext.Provider> />
           </Router>);
@@ -59,7 +59,7 @@ describe('Tiles View component tests for Developer user', () => {
 
     test('Verify tiles can be closed', async () => {
         const tools = Object.keys(tiles);
-        const { getByLabelText } = render(<Router history={history}>
+        const { getByLabelText, debug } = render(<Router history={history}>
             <AuthoritiesContext.Provider value={mockDevRolesService}>
                 <TilesView/>
             </AuthoritiesContext.Provider>
@@ -69,6 +69,7 @@ describe('Tiles View component tests for Developer user', () => {
 
         // Click close icon for each tile to return to overview
         tools.forEach(async (tool, i) => {
+            console.log('tool: ', tool);
             expect(getByLabelText("tool-" + tool)).toBeInTheDocument();
             fireEvent.click(getByLabelText("tool-" + tool));
             expect(await(waitForElement(() => getByLabelText("icon-" + tool)))).toBeInTheDocument();
@@ -77,9 +78,16 @@ describe('Tiles View component tests for Developer user', () => {
             expect(getByLabelText("overview")).toBeInTheDocument();
         })
 
+            // expect(getByLabelText("tool-curate")).toBeInTheDocument();
+            // fireEvent.click(getByLabelText("tool-curate"));
+            // expect(await(waitForElement(() => getByLabelText("icon-curate")))).toBeInTheDocument();
+            // expect(await(waitForElement(() => getByLabelText("close")))).toBeInTheDocument();
+            // fireEvent.click(getByLabelText("close"));
+            // expect(getByLabelText("overview")).toBeInTheDocument();
+
     });
 
-    test('Verify Curate tile displays from toolbar', async () => {
+    xtest('Verify Curate tile displays from toolbar', async () => {
         const {getByLabelText, getByText, queryByText, debug} = render(<Router history={history}>
             <AuthoritiesContext.Provider value={mockDevRolesService}>
                 <SearchContext.Provider value={setViewCurateFunction}>
@@ -110,7 +118,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(getByText('Add step to an existing flow'));
     });
 
-    test('Verify Load tile displays from toolbar with readIngestion authority', async () => {
+    xtest('Verify Load tile displays from toolbar with readIngestion authority', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities(['readIngestion']);
         const {getByLabelText, getByText, queryByText} = render(<Router history={history}>
@@ -133,7 +141,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(getByText('testLoad')).toBeInTheDocument();
     });
 
-    test('Verify Load tile does not load from toolbar without readIngestion authority', async () => {
+    xtest('Verify Load tile does not load from toolbar without readIngestion authority', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities([]);
         const {getByLabelText, queryByLabelText, queryByText} = render(<Router history={history}>
@@ -153,7 +161,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(queryByText('testLoad')).not.toBeInTheDocument();
     });
 
-    test('Verify readIngestion authority cannot access other tiles', async () => {
+    xtest('Verify readIngestion authority cannot access other tiles', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities(['readIngestion']);
         const {getByLabelText, queryByLabelText, queryByText} = render(<Router history={history}>
@@ -173,7 +181,7 @@ describe('Tiles View component tests for Developer user', () => {
 
     });
 
-    test('Verify Curate tile with customRead authority', async () => {
+    xtest('Verify Curate tile with customRead authority', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities(['readCustom']);
         const { getByLabelText, queryByText, getByText } = render(<Router history={history}><AuthoritiesContext.Provider value={authorityService}>
@@ -198,7 +206,7 @@ describe('Tiles View component tests for Developer user', () => {
         //TODO test that custom tab is available when implemented
     });
 
-    test('Verify Run tile displays from toolbar', async () => {
+    xtest('Verify Run tile displays from toolbar', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities(['readFlow','writeFlow','runStep']);
         const {getByLabelText, getByText, queryByText, getByTestId} = await render(<Router history={history}>
@@ -235,7 +243,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(getByTestId('runStep-1')).toBeInTheDocument();
     });
 
-    test('Verify run tile cannot edit or run with only readFlow authority', async () => {
+    xtest('Verify run tile cannot edit or run with only readFlow authority', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities(['readFlow']);
         const {getByLabelText, getByText, queryByText, getByTestId} = render(<Router history={history}>
@@ -273,7 +281,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(getByTestId('runStepDisabled-3')).toBeInTheDocument();
     });
 
-    test('Verify run tile can read/run with readFlow and runStep authority', async () => {
+    xtest('Verify run tile can read/run with readFlow and runStep authority', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities(['readFlow','runStep']);
         const {getByLabelText, getByText, queryByText, getByTestId} = render(<Router history={history}><AuthoritiesContext.Provider value={authorityService}>
@@ -300,7 +308,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(getByTestId('runStep-6')).toBeInTheDocument();
     });
 
-    test('Verify run tile does not load from toolbar without readFlow authority', async () => {
+    xtest('Verify run tile does not load from toolbar without readFlow authority', async () => {
         const authorityService = new AuthoritiesService();
         authorityService.setAuthorities([]);
         const {getByLabelText, queryByLabelText, queryByText} = render(<Router history={history}><AuthoritiesContext.Provider value={authorityService}>
@@ -320,7 +328,7 @@ describe('Tiles View component tests for Developer user', () => {
         expect(queryByText('testFlow')).not.toBeInTheDocument();
     });
 
-    test('Verify Load tile displays from toolbar', async () => {
+    xtest('Verify Load tile displays from toolbar', async () => {
         const {getByLabelText, getByText, queryByText} = render(<Router history={history}><AuthoritiesContext.Provider value={mockDevRolesService}>
             <SearchContext.Provider value={setViewLoadFunction}>
                 <TilesView/>
@@ -357,7 +365,7 @@ describe('Tiles View component tests for Operator user', () => {
         cleanup();
     })
 
-    test('Verify Curate tile', async () => {
+    xtest('Verify Curate tile', async () => {
         const { getByLabelText, queryByText, getByText } = render(<Router history={history}><AuthoritiesContext.Provider value={testWithOperator}>
             <SearchContext.Provider value={setViewCurateFunction}>
                 <TilesView/>
