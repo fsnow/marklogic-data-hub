@@ -8,7 +8,6 @@ import './toolbar.scss';
 
 interface Props {
     tiles: any;
-    onClick: any;
     enabled: any;
 }
 
@@ -41,13 +40,13 @@ const Toolbar: React.FC<Props>  = (props) => {
             {Object.keys(tiles).map((id, i) => {
                 if (tiles[id]['iconType'] === 'custom') {
                     return (
-                        <Link to={ '/tiles/' + id } aria-label={'tool-' + id + '-link'} >
+                        <Link to={ '/tiles/' + id } aria-label={'tool-' + id + '-link'} key={i}>
                             <Tooltip title={getTooltip(id)} placement="leftTop" key={i}>
-                                <div 
-                                    className={tiles[id]['icon']} 
-                                    aria-label={'tool-' + id} 
+                                <div
+                                    className={tiles[id]['icon']}
+                                    aria-label={'tool-' + id}
                                     style={getIconStyle(id)}
-                                ></div>
+                                />
                             </Tooltip>
                         </Link>
                     )
@@ -55,9 +54,9 @@ const Toolbar: React.FC<Props>  = (props) => {
                     return (
                         <Tooltip title={getTooltip(id)} placement="leftTop" key={i}>
                             <Link to={ '/tiles/' + id } aria-label={'tool-' + id + '-link'} >
-                                <i 
-                                    className={styles.tool} 
-                                    aria-label={'tool-' + id} 
+                                <i
+                                    className={styles.tool}
+                                    aria-label={'tool-' + id}
                                     style={getIconStyle(id)}
                                 ><FontAwesomeIcon icon={tiles[id]['icon']} size="lg" />
                                 </i>

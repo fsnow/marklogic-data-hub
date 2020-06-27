@@ -120,7 +120,7 @@ const TilesView = (props) => {
 
     return (
         <>
-            <Toolbar tiles={tiles} onClick={onSelect} enabled={enabled}/>
+            <Toolbar tiles={tiles} enabled={enabled}/>
             { (searchOptions.view !== null) ?  (
                 <div className={styles.tilesViewContainer}>
                     { (selection !== '') ?  (
