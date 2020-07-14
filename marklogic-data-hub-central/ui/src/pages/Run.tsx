@@ -32,6 +32,7 @@ const Run = (props) => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [flows, setFlows] = useState<any[]>([]);
+    const [steps, setSteps] = useState<any>({});
     const [runStarted, setRunStarted] = useState<any>({});
     const [runEnded, setRunEnded] = useState<any>({});
     const [running, setRunning] = useState<any[]>([]);
@@ -56,8 +57,10 @@ const Run = (props) => {
 
     useEffect(() => {
         getFlows();
+        getSteps();
         return (() => {
             setFlows([]);
+            setSteps([]);
         })
     }, [isLoading]);
 
@@ -84,6 +87,21 @@ const Run = (props) => {
         } catch (error) {
             console.error('Error getting flows', error);
             handleError(error)
+        } finally {
+          resetSessionTime();
+        }
+    }
+
+    const getSteps = async () => {
+        try {
+            let response = await axios.get('/api/steps');
+            if (response.status === 200) {
+                setSteps(response.data);
+            }
+        } catch (error) {
+            console.error('********* ERROR', error);
+            let message = error.response.data.message;
+            console.error('Error getting steps', message);
         } finally {
           resetSessionTime();
         }
@@ -392,6 +410,7 @@ const Run = (props) => {
         <div className={styles.runContainer}>
             <Flows
                 flows={flows}
+                steps={steps}
                 deleteFlow={deleteFlow}
                 createFlow={createFlow}
                 updateFlow={updateFlow}
