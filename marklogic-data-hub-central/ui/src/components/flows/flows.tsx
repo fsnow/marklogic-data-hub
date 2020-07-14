@@ -1,5 +1,6 @@
 import React, { useState, CSSProperties, useEffect } from 'react';
-import { Collapse, Spin, Icon, Card, Tooltip, Modal, Upload, message } from 'antd';
+import { Collapse, Spin, Icon, Card, Tooltip, Modal, Upload, message, Menu, Dropdown } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrashAlt } from '@fortawesome/free-regular-svg-icons';
 import { MLButton } from '@marklogic/design-system';
@@ -8,11 +9,14 @@ import sourceFormatOptions from '../../config/formats.config';
 import {RunToolTips} from '../../config/tooltips.config';
 import styles from './flows.module.scss';
 import { MLTooltip, MLSpin, MLUpload } from '@marklogic/design-system';
+import './flows.scss';
 
 const { Panel } = Collapse;
+const { SubMenu } = Menu;
 
 interface Props {
     flows: any;
+    steps: any;
     deleteFlow: any;
     createFlow: any;
     updateFlow: any;
@@ -49,6 +53,7 @@ const Flows: React.FC<Props> = (props) => {
     const [flowData, setFlowData] = useState({});
     const [dialogVisible, setDialogVisible] = useState(false);
     const [stepDialogVisible, setStepDialogVisible] = useState(false);
+    const [addStepDialogVisible, setAddStepDialogVisible] = useState(false);
     const [flowName, setFlowName] = useState('');
     const [stepName, setStepName] = useState('');
     const [stepType, setStepType] = useState('');
@@ -95,6 +100,13 @@ const Flows: React.FC<Props> = (props) => {
         return customStyles;
     }
 
+    const handleStepAdd = async (stepName, flowName, stepType) => {
+        setAddStepDialogVisible(true);
+        setFlowName(flowName);
+        setStepName(stepName);
+        setStepType(stepType);
+    }
+
     const handleFlowDelete = (name) => {
         setDialogVisible(true);
         setFlowName(name);
@@ -109,18 +121,24 @@ const Flows: React.FC<Props> = (props) => {
     }
 
     const onOk = (name) => {
-        props.deleteFlow(name)
+        props.deleteFlow(name);
         setDialogVisible(false);
     }
 
     const onStepOk = (flowName, stepNumber) => {
-        props.deleteStep(flowName, stepNumber)
+        props.deleteStep(flowName, stepNumber);
         setStepDialogVisible(false);
+    }
+
+    const onAddStepOk = (stepName, flowName, stepType) => {
+        props.addStepToFlow(stepName, flowName, stepType);
+        setAddStepDialogVisible(false);
     }
 
     const onCancel = () => {
         setDialogVisible(false);
         setStepDialogVisible(false);
+        setAddStepDialogVisible(false);
     }
 
     const deleteConfirmation = (
@@ -151,36 +169,77 @@ const Flows: React.FC<Props> = (props) => {
         </Modal>
     );
 
-    const deleteIcon = (name, i) => (
-        <span className={styles.deleteFlow}>
-            {props.canWriteFlow ?
-                <MLTooltip title={'Delete Flow'} placement="bottom">
-                    <i aria-label={'deleteFlow-' + i}>
-                        <FontAwesomeIcon
-                            icon={faTrashAlt}
-                            onClick={event => {
-                                event.stopPropagation(); // Do not trigger collapse
-                                handleFlowDelete(name);
-                            }}
-                            data-testid={'deleteFlow-' + i}
-                            className={styles.deleteIcon}
-                            size="lg"/>
-                    </i>
-                </MLTooltip> :
-                <MLTooltip title={'Delete'} placement="bottom">
-                    <i aria-label={'deleteStep-' + i}>
-                        <FontAwesomeIcon
-                            icon={faTrashAlt}
-                            onClick={(event) => {
-                                event.stopPropagation();
-                                event.preventDefault();
-                            }}
-                            data-testid={'deleteFlow-' + i}
-                            className={styles.disabledDeleteIcon}
-                            size="lg"/>
-                    </i>
-                </MLTooltip> }
-        </span>
+    const addStepConfirmation = (
+        <Modal
+            visible={addStepDialogVisible}
+            okText='Yes'
+            okType='primary'
+            cancelText='No'
+            onOk={() => onAddStepOk(stepName, flowName, stepType)}
+            onCancel={() => onCancel()}
+            width={350}
+        >
+            <div style={{fontSize: '16px', padding: '10px'}}>Are you sure you want to add step "{stepName}" to flow "{flowName}"?</div>
+        </Modal>
+    );
+
+    const stepMenu = (flowName) => { return (
+        <Menu>
+            <Menu.ItemGroup title="Load">
+            { props.steps && props.steps['ingestionSteps'] && props.steps['ingestionSteps'].length > 0 ? props.steps['ingestionSteps'].map((elem,index) => (
+                <Menu.Item key={index}>
+                    <span 
+                        onClick={() => { handleStepAdd(elem.name, flowName, 'ingestion'); }}
+                    >{elem.name}</span>
+                </Menu.Item>
+            )) : null }
+            </Menu.ItemGroup>
+            <Menu.ItemGroup title="Map">
+            { props.steps && props.steps['mappingSteps'] && props.steps['mappingSteps'].length > 0 ? props.steps['mappingSteps'].map((elem,index) => (
+                <Menu.Item key={index}>
+                    <span 
+                        onClick={() => { handleStepAdd(elem.name, flowName, 'mapping'); }}
+                    >{elem.name}</span>
+                </Menu.Item>
+            )) : null }
+            </Menu.ItemGroup>
+        </Menu>
+    )};
+
+    const panelActions = (name, i) => (
+        <div 
+            id="panelActions" 
+            onClick={event => {
+                event.stopPropagation(); // Do not trigger collapse
+                event.preventDefault();
+            }}
+        >
+            <Dropdown overlay={stepMenu(name)} trigger={['click']} disabled={true}>
+                <a className="ant-dropdown-link">Add Step <DownOutlined /></a>
+            </Dropdown>
+            <span className={styles.deleteFlow}>
+                {props.canWriteFlow ?
+                    <MLTooltip title={'Delete Flow'} placement="bottom">
+                        <i aria-label={'deleteFlow-' + i}>
+                            <FontAwesomeIcon
+                                icon={faTrashAlt}
+                                onClick={() => { handleFlowDelete(name); }}
+                                data-testid={'deleteFlow-' + i}
+                                className={styles.deleteIcon}
+                                size="lg"/>
+                        </i>
+                    </MLTooltip> :
+                    <MLTooltip title={'Delete'} placement="bottom">
+                        <i aria-label={'deleteStep-' + i}>
+                            <FontAwesomeIcon
+                                icon={faTrashAlt}
+                                data-testid={'deleteFlow-' + i}
+                                className={styles.disabledDeleteIcon}
+                                size="lg"/>
+                        </i>
+                    </MLTooltip> }
+            </span>
+        </div>
     );
 
     const flowHeader = (name, index) => (
@@ -334,7 +393,7 @@ const Flows: React.FC<Props> = (props) => {
                 )
             });
             return (
-                <Panel header={flowHeader(flowName, i)} key={i} extra={deleteIcon(flowName, i)}>
+                <Panel header={flowHeader(flowName, i)} key={i} extra={panelActions(flowName, i)}>
                     <div className={styles.panelContent}>
                         {cards}
                     </div>
@@ -380,6 +439,7 @@ const Flows: React.FC<Props> = (props) => {
                 />
                 {deleteConfirmation}
                 {deleteStepConfirmation}
+                {addStepConfirmation}
             </> :
             <div></div>
         }
