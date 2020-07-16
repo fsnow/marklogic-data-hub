@@ -214,8 +214,12 @@ const Flows: React.FC<Props> = (props) => {
                 event.preventDefault();
             }}
         >
-            <Dropdown overlay={stepMenu(name)} trigger={['click']} disabled={true}>
-                <a className="ant-dropdown-link">Add Step <DownOutlined /></a>
+            <Dropdown overlay={stepMenu(name)} trigger={['click']} disabled={!props.canWriteFlow}> 
+                <MLButton
+                    className={styles.addStep} size="default"
+                    type="primary"
+                    disabled={!props.canWriteFlow}
+                >Add Step <DownOutlined /></MLButton>
             </Dropdown>
             <span className={styles.deleteFlow}>
                 {props.canWriteFlow ?
