@@ -389,6 +389,33 @@ const flows = {
   "status" :200
 }
 
+const steps = {
+  "data": {
+    "ingestionSteps": [
+      {
+        "stepId": "step1-ingestion",
+        "name": "Step 1"
+      },
+      {
+        "stepId": "step2-ingestion",
+        "name": "Step 2"
+      }
+    ],
+    "mappingSteps": [
+      {
+        "stepId": "step3-mapping",
+        "name": "Step 3"
+      },
+      {
+        "stepId": "step4-mapping",
+        "name": "Step 4"
+      }
+    ]
+  }
+  ,
+  "status" :200
+}
+
 const jobRespSuccess = {
   "data": {
     "jobId": "e4590649-8c4b-419c-b6a1-473069186592",
@@ -487,6 +514,7 @@ const customSteps = {"data" :{"stepsWithEntity":[{
 const data = {
     primaryEntityTypes,
     flows: flows,
+    steps: steps,
     entityTypes: entityTypes,
     response: response,
     loads: loads,

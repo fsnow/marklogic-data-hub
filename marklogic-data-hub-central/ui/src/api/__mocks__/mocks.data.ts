@@ -63,6 +63,8 @@ const curateAPI = (axiosMock) => {
     switch (url) {
       case '/api/flows':
         return Promise.resolve(curateData.flows);
+      case '/api/steps':
+        return Promise.resolve(curateData.steps);
       case '/api/models/primaryEntityTypes':
         return Promise.resolve(curateData.primaryEntityTypes);
       case '/api/steps/ingestion':
@@ -89,7 +91,9 @@ const runAPI = (axiosMock) => {
   return axiosMock.get['mockImplementation']((url) => {
     switch (url) {
       case '/api/flows':
-        return Promise.resolve(curateData.flows)
+        return Promise.resolve(curateData.flows);
+      case '/api/steps':
+        return Promise.resolve(curateData.steps);
       case '/api/steps/ingestion':
         return Promise.resolve(curateData.loads);
       case '/api/steps/mapping':
@@ -136,7 +140,9 @@ const runAPI = (axiosMock) => {
     return axiosMock.get['mockImplementation']((url) => {
       switch (url) {
         case '/api/flows':
-          return Promise.resolve(curateData.flows)
+          return Promise.resolve(curateData.flows);
+        case '/api/steps':
+          return Promise.resolve(curateData.steps);
         case '/api/steps/ingestion':
           return Promise.resolve(curateData.loads);
         case '/api/steps/mapping':
@@ -153,7 +159,9 @@ const runFailedAPI = (axiosMock) => {
   return axiosMock.get['mockImplementation']((url) => {
     switch (url) {
       case '/api/flows':
-        return Promise.resolve(curateData.flows)
+        return Promise.resolve(curateData.flows);
+      case '/api/steps':
+        return Promise.resolve(curateData.steps);
       case '/api/steps/ingestion':
         return Promise.resolve(curateData.loads);
       case '/api/steps/mapping':
@@ -171,6 +179,8 @@ const runXMLAPI = (axiosMock) => {
     switch (url) {
       case '/api/flows':
         return Promise.resolve(curateData.flowsXML);
+      case '/api/steps':
+        return Promise.resolve(curateData.steps);
       case '/api/steps/ingestion':
         return Promise.resolve(curateData.loadsXML);
       case '/api/steps/mapping':
