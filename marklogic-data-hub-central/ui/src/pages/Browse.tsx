@@ -168,7 +168,9 @@ const Browse: React.FC<Props> = ({ location }) => {
             location.state['query'])
         location.state['tableView'] ? toggleTableView(true) : toggleTableView(false);
     }
-
+    if(location.state && location.state['entityName'] && location.state['jobId']){
+        setLatestJobFacet(location.state['jobId'], location.state['entityName']);
+    }
     if (location.state && location.state['entity']) {
       setEntityClearQuery(location.state['entity']);
     }
@@ -222,7 +224,14 @@ const Browse: React.FC<Props> = ({ location }) => {
     return (
       <>
         <Query queries={queries} setQueries={setQueries} isSavedQueryUser={isSavedQueryUser} columns={columns} setIsLoading={setIsLoading} entities={entities} selectedFacets={[]} greyFacets={[]} />
-        <ZeroStateExplorer entities={entities} setEntity={setEntity} queries={queries} columns={columns} setIsLoading={setIsLoading} tableView={tableView} toggleTableView={toggleTableView} />
+        <ZeroStateExplorer
+            entities={entities}
+            setEntity={setEntity}
+            queries={queries}
+            columns={columns}
+            setIsLoading={setIsLoading}
+            tableView={tableView}
+            toggleTableView={toggleTableView} />
       </>
     );
   } else {
@@ -280,7 +289,15 @@ const Browse: React.FC<Props> = ({ location }) => {
                     </div>
                   </div>
                 </div>
-                <Query queries={queries} setQueries={setQueries} isSavedQueryUser={isSavedQueryUser} columns={columns} setIsLoading={setIsLoading} entities={entities} selectedFacets={selectedFacets} greyFacets={greyFacets} isColumnSelectorTouched={isColumnSelectorTouched}/>
+                <Query queries={queries}
+                       setQueries={setQueries}
+                       isSavedQueryUser={isSavedQueryUser}
+                       columns={columns}
+                       setIsLoading={setIsLoading}
+                       entities={entities}
+                       selectedFacets={selectedFacets}
+                       greyFacets={greyFacets}
+                       isColumnSelectorTouched={isColumnSelectorTouched}/>
               </div>
               <div className={styles.fixedView} >
                 {tableView ?
@@ -296,7 +313,7 @@ const Browse: React.FC<Props> = ({ location }) => {
                           tableView={tableView}
                       />
                   </div>
-                  : <SearchResults data={data} entityDefArray={entityDefArray}  tableView={tableView}/>
+                  : <SearchResults data={data} entityDefArray={entityDefArray}  tableView={tableView} columns={columns}/>
                 }
               </div>
               <br />
