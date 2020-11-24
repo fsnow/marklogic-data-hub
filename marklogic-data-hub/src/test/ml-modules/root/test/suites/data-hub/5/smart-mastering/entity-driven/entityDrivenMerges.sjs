@@ -15,12 +15,14 @@ function verifyResults(content, results) {
 }
 
 function testMerge(content, stepId) {
-    const results = merge.main(content, {stepId})[0].value;
+    const results = merge.main(content, {stepId}).filter((doc) => {
+            return doc.uri.includes('CustMerged');
+        })[0].value;
     return verifyResults(content, results);
 }
 
 function testJsonMerge() {
-    const content = { uri:'CustMerged' };
+    const content = { uri:'/content/customerMatchSummary.json' };
     return testMerge(content, 'mergeCustomers-merging');
 }
 
