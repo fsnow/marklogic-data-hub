@@ -33,16 +33,17 @@ at "/data-hub/5/impl/http-utils.xqy";
 declare variable $write-objects-by-uri as map:map := map:map();
 
 declare function util-impl:add-all-write-objects(
-  $write-objects as map:map*
-) as map:map? {
+  $write-objects as map:map*)
+  as map:map?
+{
   for $write-object in $write-objects
   return map:put($write-objects-by-uri, $write-object => map:get("uri"), $write-object),
   $write-objects-by-uri
 };
 
 declare function util-impl:retrieve-write-object(
-  $uri as xs:string
-) as map:map?
+  $uri as xs:string)
+  as map:map?
 {
   if (map:contains($write-objects-by-uri, $uri)) then
     $write-objects-by-uri
@@ -56,7 +57,7 @@ declare function util-impl:retrieve-write-object(
 };
 
 declare function util-impl:build-write-object-for-doc($doc as document-node())
-as map:map
+  as map:map
 {
   map:new((
     map:entry("uri", xdmp:node-uri($doc)),
@@ -71,8 +72,8 @@ as map:map
 
 declare function util-impl:adjust-collections-on-document(
   $uri as xs:string,
-  $collection-function as function(map:map) as xs:string*
-) {
+  $collection-function as function(map:map) as xs:string*)
+{
   let $write-object := util-impl:retrieve-write-object($uri)
   let $write-context := $write-object => map:get("context")
   let $current-collections := $write-context => map:get("collections")
@@ -86,7 +87,9 @@ declare function util-impl:adjust-collections-on-document(
   )
 };
 
-declare function util-impl:combine-maps($base-map as map:map, $maps as map:map*) {
+declare function util-impl:combine-maps($base-map as map:map, $maps as map:map*)
+  as map:map
+{
   fn:fold-left(function($map1,$map2) {
     $map1 + $map2
   }, $base-map, $maps)
@@ -98,8 +101,9 @@ declare function util-impl:properties-to-values-functions(
     $property-definitions as node()?,
     $entity-type-iri as xs:string?,
     $return-all-properties as xs:boolean,
-    $message-output as map:map?
-) {
+    $message-output as map:map?)
+    as map:map
+{
   let $xpath-namespaces :=
     if (fn:exists($property-definitions/namespaces)) then
       xdmp:from-json($property-definitions/namespaces)
@@ -115,16 +119,18 @@ declare function util-impl:properties-to-values-functions(
       es-helper:get-entity-property-info($entity-type-iri)
     else
       map:map()
-  let $distinct-properties := fn:distinct-values((
-    $property-definitions/*:property/(@name|name) ! fn:string(.),
-    if ($return-all-properties) then
-      map:keys($entity-property-info)
-    else (
-      $rules/(@property-name|propertyName),
-      $rules/entityPropertyPath
-    ),
-    $rules/documentXPath
-  ))
+  let $_ := xdmp:log("entity-type-iri: " || $entity-type-iri)
+  let $distinct-properties :=
+    fn:distinct-values((
+      $property-definitions/*:property/(@name|name) ! fn:string(.),
+      if ($return-all-properties) then
+        map:keys($entity-property-info)
+      else (
+        $rules/(@property-name|propertyName),
+        $rules/entityPropertyPath
+      ),
+      $rules/documentXPath
+    ))
   return map:new(
     for $property-name in $distinct-properties
     let $entity-property-info := $entity-property-info => map:get($property-name)
@@ -132,13 +138,18 @@ declare function util-impl:properties-to-values-functions(
     let $document-xpath-rule := fn:head(($property-definition[@path|path], $rules[documentXPath eq $property-name]))
     let $function :=
       if (fn:exists($entity-property-info)) then
+        let $_ := xdmp:log("********** case 1 ****************")
         let $xpath := $entity-property-info => map:get("pathExpression")
         let $namespaces := $entity-property-info => map:get("namespaces")
+        let $_ := xdmp:log("********** xpath: " || $xpath)
+        let $_ := xdmp:log("********** namespaces: ")
+        let $_ := xdmp:log($namespaces)
         return
           function($document) {
             xdmp:unpath($xpath, $namespaces, $document)
           }
       else if (fn:exists($document-xpath-rule)) then
+        let $_ := xdmp:log("********** case 2 ****************")
         let $xpath := fn:head(($document-xpath-rule/(@path|path),$property-name))
         let $namespaces := fn:head(($document-xpath-rule/namespaces ! xdmp:from-json(.), $xpath-namespaces))
         return
@@ -146,6 +157,8 @@ declare function util-impl:properties-to-values-functions(
             xdmp:unpath($xpath, $namespaces, $document)
           }
       else if (fn:exists($property-definition)) then
+        let $_ := xdmp:log("********** case 3 ****************")
+        return
         function($document) {
           let $qname := fn:QName(fn:string($property-definition/(@namespace|namespace)), fn:string($property-definition/(@localname|localname)))
           return $document/*:envelope/*:instance//*[fn:node-name(.) eq $qname]
@@ -157,7 +170,9 @@ declare function util-impl:properties-to-values-functions(
   )
 };
 
-declare function util-impl:handle-option-messages($type as xs:string, $message as xs:string, $messages-output as map:map?) {
+declare function util-impl:handle-option-messages($type as xs:string, $message as xs:string, $messages-output as map:map?)
+  as empty-sequence()
+{
   if (fn:exists($messages-output)) then
     map:put($messages-output, $type, (map:get($messages-output, $type),$message))
   else if ($type eq "error") then
