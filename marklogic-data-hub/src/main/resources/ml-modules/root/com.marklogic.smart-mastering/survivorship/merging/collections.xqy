@@ -182,13 +182,13 @@ declare function collection-impl:default-collection-handler(
     $event-options/*:set//text() ! fn:normalize-space(.)[. ne '']
   else (
     let $merge-options := collection-impl:get-options-root($event-options)
-    let $match-options := matcher:get-options($merge-options/(merging:match-options|matchOptions), $const:FORMAT-XML)
-    let $content-collection-options := fn:head(($match-options,$merge-options))
+    let $match-options := matcher:get-options($merge-options/(merging:match-options|matchOptions))
+    let $content-collection-options := fn:head(($match-options, $merge-options))
     let $all-collections := fn:distinct-values((
           map:keys(-$collections-by-uri),
           switch ($event-name)
             case $const:ON-MERGE-EVENT return
-              (coll:merged-collections($merge-options),coll:content-collections($content-collection-options))
+              (coll:merged-collections($merge-options), coll:content-collections($content-collection-options))
             case $const:ON-NO-MATCH return
               coll:content-collections($content-collection-options)
             case $const:ON-ARCHIVE-EVENT return

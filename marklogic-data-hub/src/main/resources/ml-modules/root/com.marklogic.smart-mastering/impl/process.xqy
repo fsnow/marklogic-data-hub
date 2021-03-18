@@ -48,11 +48,11 @@ declare option xdmp:mapping "false";
 declare function proc-impl:process-match-and-merge($input as item()*)
   as item()*
 {
-  let $merging-options := merging:get-JSON-options()
+  let $merging-options := merging:get-json-options()
   return
     if (fn:exists($merging-options)) then
       for $merge-options in $merging-options
-      let $match-options := matcher:get-options(fn:string($merge-options/merging:match-options), $const:FORMAT-XML)
+      let $match-options := matcher:get-json-options($merge-options/options/matchOptions/fn:string())
       return
         proc-impl:process-match-and-merge-with-options-save($input, $merge-options, $match-options, cts:true-query(), fn:false())
     else
@@ -68,9 +68,11 @@ declare function proc-impl:process-match-and-merge(
   let $all-options :=
     xdmp:invoke-function(
       function() {
-        let $merge-options := merging:get-JSON-options($option-name)
+        let $merge-options := merging:get-json-options($option-name)
         let $match-options-name := $merge-options/options/matchOptions/fn:string()
-        let $match-options := matcher:get-options($match-options-name, $const:FORMAT-XML)
+        let $log := xdmp:log("match-options-name: " || $match-options-name)
+        let $match-options := matcher:get-json-options($match-options-name)
+        let $log := xdmp:log("match-options: " || xdmp:describe($match-options, (), ()))
         return
           map:map()
             => map:with("merge-options", $merge-options)
@@ -768,6 +770,9 @@ declare function proc-impl:build-content-objects-from-match-summary(
                   if (map:contains($custom-action-function-map, $threshold-name)) then
                     $custom-action-function-map => map:get($threshold-name)
                   else
+                    let $log := xdmp:log("before calling function-lookup")
+                    let $log := xdmp:log($custom-action)
+                    let $log := xdmp:log("after custom-action logging")
                     let $action-func := fun-ext:function-lookup(
                                   $custom-action => map:get("function"),
                                   $custom-action => map:get("namespace"),

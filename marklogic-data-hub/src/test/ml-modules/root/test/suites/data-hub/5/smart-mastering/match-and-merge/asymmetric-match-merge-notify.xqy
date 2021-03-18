@@ -33,12 +33,12 @@ import module namespace test = "http://marklogic.com/test" at "/test/test-helper
 
 declare option xdmp:mapping "false";
 
-matcher:save-options($lib:MATCH-OPTIONS-CUST-DOB-NAME, test:get-test-file($lib:MATCH-OPTIONS-CUST-DOB-NAME || ".json")/matchOptions)
+matcher:save-json-options($lib:MATCH-OPTIONS-CUST-DOB-NAME, test:get-test-file($lib:MATCH-OPTIONS-CUST-DOB-NAME || ".json")/node())
 ,
 for $uri in cts:uris()
 return xdmp:log($uri)
 ,
-merging:save-JSON-options($lib:MERGE-OPTIONS-NAME, test:get-test-file("merge-options.json"))
+merging:save-json-options($lib:MERGE-OPTIONS-NAME, test:get-test-file("merge-options.json"))
 ,
 for $uri in ($lib:URI-DOB1, $lib:URI-DOB2)
 let $doc := test:get-test-file(map:get($lib:TEST-DATA, $uri))
@@ -74,8 +74,8 @@ declare option xdmp:mapping "false";
 let $actual :=
   xdmp:invoke-function(
     function() {
-      let $match-options := matcher:get-options($lib:MATCH-OPTIONS-CUST-DOB-NAME, $const:FORMAT-XML)
-      let $merge-options := merging:get-JSON-options($lib:MERGE-OPTIONS-NAME)
+      let $match-options := matcher:get-json-options($lib:MATCH-OPTIONS-CUST-DOB-NAME)
+      let $merge-options := merging:get-json-options($lib:MERGE-OPTIONS-NAME)
       return process:process-match-and-merge-with-options(($lib:URI-DOB2, $lib:URI-DOB1), $merge-options, $match-options, cts:true-query(), fn:false())
     },
     $lib:INVOKE_OPTIONS
@@ -87,11 +87,7 @@ let $_ :=
   test:assert-true(json:array-size($actual) gt 1, "There should be at least one item in the array")
 )
 
-let $actual := json:array-values($actual)
-
-let $uris :=
-  for $obj in $actual
-  return map:get($obj, "uri")
+let $uris := json:array-values($actual) ! map:get(., "uri")
 
 return (
   test:assert-equal(1, fn:count($uris[fn:contains(., "/merged/")]), "There should be one merged document."),

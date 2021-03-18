@@ -14,7 +14,7 @@ import module namespace lib = "http://marklogic.com/smart-mastering/test" at "li
 
 declare option xdmp:mapping "false";
 
-matcher:save-options($lib:OPTIONS-NAME-CUST-ACTION-XQY-MATCH, test:get-test-file("custom-xqy-action-match-options.xml"))
+matcher:save-json-options($lib:OPTIONS-NAME-CUST-ACTION-XQY-MATCH, test:get-test-file("custom-xqy-action-match-options.json"))
 
 ;
 
@@ -49,7 +49,7 @@ merging:save-JSON-options($lib:TWO-FIRST-OPTIONS, test:get-test-file("two-first-
 merging:save-JSON-options($lib:NESTED-OPTIONS, test:get-test-file("nested-merge-options.json")),
 
 merging:save-JSON-options($lib:OPTIONS-NAME-CUST-ACTION-XQY-MERGE, test:get-test-file("custom-xqy-action-merge-options.json")),
-matcher:save-options($lib:OPTIONS-NAME-CUST-ACTION-SJS-MATCH, test:get-test-file("custom-sjs-action-match-options.xml")),
+matcher:save-json-options($lib:OPTIONS-NAME-CUST-ACTION-SJS-MATCH, test:get-test-file("custom-sjs-action-match-options.json")),
 merging:save-JSON-options($lib:OPTIONS-NAME-CUST-ACTION-SJS-MERGE, test:get-test-file("custom-sjs-action-merge-options.json")),
 
 test:load-test-file("custom-merge-xqy.xqy", xdmp:modules-database(), "/custom-merge-xqy.xqy", $module-permissions),
@@ -59,3 +59,11 @@ test:load-test-file("custom-triple-merge-sjs.sjs", xdmp:modules-database(), "/cu
 test:load-test-file("custom-action-xqy.xqy", xdmp:modules-database(), "/custom-action.xqy", $module-permissions),
 test:load-test-file("custom-action-sjs.sjs", xdmp:modules-database(), "/custom-action.sjs", $module-permissions),
 test:load-test-file("combine.xqy", xdmp:modules-database(), "/combine.xqy", $module-permissions)
+
+;
+
+xquery version "1.0-ml";
+import module namespace spell = "http://marklogic.com/xdmp/spell"
+    at "/MarkLogic/spell.xqy";
+
+spell:insert("name-dictionary.xml", <dictionary xmlns="http://marklogic.com/xdmp/spell"/>)

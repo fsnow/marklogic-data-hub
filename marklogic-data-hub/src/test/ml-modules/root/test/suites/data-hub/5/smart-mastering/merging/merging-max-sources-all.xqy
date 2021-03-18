@@ -1,5 +1,10 @@
 xquery version "1.0-ml";
 
+(:
+FSnow 3/4/2021
+This module is a candidate for removal or rewrite because it uses old options and legacy entity-less merging
+:)
+
 import module namespace const = "http://marklogic.com/smart-mastering/constants"
   at "/com.marklogic.smart-mastering/constants.xqy";
 import module namespace merging-impl = "http://marklogic.com/smart-mastering/survivorship/merging"

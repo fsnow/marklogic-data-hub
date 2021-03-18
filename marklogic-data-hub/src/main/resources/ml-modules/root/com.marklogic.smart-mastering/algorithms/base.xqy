@@ -54,7 +54,10 @@ declare function algorithms:build-algorithms-map($algorithms as node()*)
       let $algorithms-map as map:map :=
         map:new((
           for $algorithm as node() in $algorithms
-          let $name as xs:string? := $algorithm/(@name|name) ! fn:string(.)
+          let $algorithm := if (fn:exists($algorithm/algorithm)) then $algorithm/algorithm else $algorithm
+          let $log := xdmp:log("algorithm object:")
+          let $log := xdmp:log($algorithm)
+          let $name as xs:string? := $algorithm/name ! fn:string(.)
           let $function-name as xs:string := fn:string($algorithm/(@function|function|algorithmFunction))
           let $module-namespace as xs:string := fn:string($algorithm/(@namespace|namespace|algorithmModuleNamespace))
           let $module-path as xs:string := fn:string($algorithm/(@at|at|algorithmModulePath))
@@ -74,6 +77,8 @@ declare function algorithms:build-algorithms-map($algorithms as node()*)
         ))
       return (
         map:put($_cached-algorithms-map, $key, $algorithms-map),
+        xdmp:log("algorithm-map"),
+        xdmp:log($algorithms-map),
         $algorithms-map
       )
 };
@@ -85,13 +90,17 @@ declare function algorithms:build-algorithms-map($algorithms as node()*)
  : @param $options the match options
  : @return empty sequence
  :)
-declare function algorithms:setup-algorithms($options as element(matcher:options))
+declare function algorithms:setup-algorithms($options)
 {
-  let $setup-map := algorithms:setup-map-from-xml($options/*:algorithms)
-  for $item in $options//*[@algorithm-ref]
+xdmp:log("*********** algorithms:setup-algorithms *************"),
+xdmp:log($options),
+xdmp:log("*********** algorithms:setup-algorithms after options *************")
+,
+  let $setup-map := algorithms:setup-map-from-json($options/algorithms)
+  for $item in $options//*[algorithmRef]
   return
     fun-ext:execute-function(
-      map:get($setup-map, fn:string($item/@algorithm-ref)),
+      map:get($setup-map, fn:string($item/algorithmRef)),
       map:new((
         map:entry("arg1", $item),
         map:entry("arg2", $options)
@@ -106,6 +115,13 @@ declare function algorithms:setup-map-from-xml($algorithms-xml as element(matche
 {
   algorithms:setup-map-from-map(
     algorithms:build-algorithms-map($algorithms-xml/*:algorithm)
+  )
+};
+
+declare function algorithms:setup-map-from-json($algorithms as object-node())
+{
+  algorithms:setup-map-from-map(
+    algorithms:build-algorithms-map($algorithms/algorithm)
   )
 };
 

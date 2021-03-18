@@ -1,0 +1,73 @@
+{
+  "envelope": {
+    "headers": {
+      "sources": [
+        {
+          "name": "source 2"
+        }
+      ],
+      "createdOn": "2020-08-20T05:27:43.360675Z",
+      "createdBy": "admin"
+    },
+    "triples": [],
+    "instance": {
+      "info": {
+        "title": "Customer",
+        "version": "0.0.1",
+        "baseUri": "http://example.org/"
+      },
+      "Customer": {
+        "customerId": 105,
+        "name": "Amerigo Vespucci",
+        "birthDate": "1919-01-01",
+        "shipping": [
+          {
+            "Address": {
+              "street": [
+                "345 Ulterior Way"
+              ],
+              "city": "Fort Myers",
+              "state": "Florida",
+              "zip": {
+                "Zip": {
+                  "fiveDigit": "33912",
+                  "plusFour": "1001"
+                }
+              }
+            }
+          },
+          {
+            "Address": {
+              "street": [
+                "72 Bayshore Dr"
+              ],
+              "city": "Naples",
+              "state": "Florida",
+              "zip": {
+                "Zip": {
+                  "fiveDigit": "34112",
+                  "plusFour": "1234"
+                }
+              }
+            }
+          }
+        ],
+        "billing": {
+          "Address": {
+            "street": [
+              "73 Bayshore Dr"
+            ],
+            "city": "Naples",
+            "state": "Florida",
+            "zip": {
+              "Zip": {
+                "fiveDigit": "34112",
+                "plusFour": "1234"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

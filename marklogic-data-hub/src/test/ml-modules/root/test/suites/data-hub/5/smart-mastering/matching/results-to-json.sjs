@@ -6,7 +6,7 @@ const test = require("/test/test-helper.xqy");
 
 let doc = fn.doc(lib.URI2);
 
-let options = matcher.getOptionsAsXml("match-test");
+let options = matcher.getOptions("match-test");
 
 let actualXML = matcher.findDocumentMatchesByOptions(doc, options, 1, 6, true, cts.trueQuery());
 

@@ -32,3 +32,8 @@ declare function algorithms:standard-reduction-query(
             helper-impl:property-name-to-query($options, $property-name)($value, $weight)
   ))
 };
+
+declare function algorithms:standard-reduction($document, $reduce, $options)
+{
+  algorithms:standard-reduction-query($document, $reduce, $options)
+};

@@ -11,7 +11,7 @@ import module namespace test = "http://marklogic.com/test" at "/test/test-helper
 declare option xdmp:mapping "false";
 
 let $doc := fn:doc($lib:URI2)
-let $options := matcher:get-options($lib:SCORE-OPTIONS-NAME, $const:FORMAT-XML)
+let $options := matcher:get-options($lib:SCORE-OPTIONS-NAME)
 let $max-score := fn:sum($options//*:add/@weight)
 let $actual := matcher:find-document-matches-by-options-name($doc, $lib:SCORE-OPTIONS-NAME)
 let $score := $actual//result[@uri="/source/3/doc3.xml"]/@score/xs:int(.)
@@ -20,7 +20,7 @@ return (
 ),
 
 let $doc := fn:doc($lib:URI2)
-let $options := matcher:get-options($lib:SCORE-OPTIONS-NAME2, $const:FORMAT-XML)
+let $options := matcher:get-options($lib:SCORE-OPTIONS-NAME2)
 let $max-score := fn:sum($options//*:add/@weight)
 let $actual := matcher:find-document-matches-by-options-name($doc, $lib:SCORE-OPTIONS-NAME2)
 let $score := $actual//result[@uri="/source/3/doc3.xml"]/@score/xs:int(.)

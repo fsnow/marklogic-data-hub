@@ -13,14 +13,12 @@ xquery version "1.0-ml";
  :)
 
 import module namespace const = "http://marklogic.com/smart-mastering/constants"
-at "/com.marklogic.smart-mastering/constants.xqy";
+  at "/com.marklogic.smart-mastering/constants.xqy";
 import module namespace process = "http://marklogic.com/smart-mastering/process-records"
-at "/com.marklogic.smart-mastering/process-records.xqy";
+  at "/com.marklogic.smart-mastering/process-records.xqy";
 import module namespace lib = "http://marklogic.com/smart-mastering/test" at "lib/lib.xqy";
-
 import module namespace matcher = "http://marklogic.com/smart-mastering/matcher"
   at "/com.marklogic.smart-mastering/matcher.xqy";
-
 import module namespace test = "http://marklogic.com/test" at "/test/test-helper.xqy";
 
 declare namespace es="http://marklogic.com/entity-services";
@@ -33,9 +31,9 @@ declare option xdmp:mapping "false";
 declare variable $MERGED-QNAME := xs:QName("es:envelope");
 declare variable $NOTIFY-QNAME := xs:QName("sm:notification");
 
-let $actual := matcher:get-notifications-as-xml(1, 10, map:map())
-return
-  test:assert-equal(0, fn:count($actual)),
+let $actual := matcher:get-notifications(1, 10, map:map(), $const:FORMAT-XML)
+return test:assert-equal(0, fn:count($actual))
+,
 
 let $_ :=
   xdmp:invoke-function(
@@ -46,7 +44,7 @@ let $_ :=
   )
 
 let $actual := xdmp:invoke-function(function() {
-  matcher:get-notifications-as-xml(1, 10, map:map())
+  matcher:get-notifications(1, 10, map:map(), $const:FORMAT-XML)
 }, $lib:INVOKE_OPTIONS)
 return
   test:assert-equal(1, fn:count($actual))

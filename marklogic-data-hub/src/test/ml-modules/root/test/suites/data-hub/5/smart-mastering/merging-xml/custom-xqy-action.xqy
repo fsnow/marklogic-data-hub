@@ -42,7 +42,7 @@ let $merged-doc :=
     $lib:INVOKE_OPTIONS
   )
 
-(: verifiy that the custom action was called twice :)
+(: verify that the custom action was called twice :)
 let $assertions := (
   $assertions,
   map:keys($lib:TEST-DATA) ! test:assert-true(local:confirm-file("/xqy-action-output" || .))

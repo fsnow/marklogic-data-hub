@@ -14,8 +14,8 @@ Example of a simple DOB matching algorithm that expands the query by bumping eac
 :)
 declare function algorithms:dob-match(
   $expand-values as xs:string*,
-  $expand-xml as element(matcher:expand),
-  $options-xml as element(matcher:options)
+  $expand as object-node(),
+  $options as object-node()
 ) as cts:query*
 {
   let $property-name := $expand-xml/@property-name

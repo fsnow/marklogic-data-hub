@@ -10,7 +10,7 @@ import module namespace matcher = "http://marklogic.com/smart-mastering/matcher"
 import module namespace const = "http://marklogic.com/smart-mastering/constants" at "/com.marklogic.smart-mastering/constants.xqy";
 
 
-let $actual := matcher:get-option-names($const:FORMAT-JSON)
+let $actual := matcher:get-option-names()
 
 return (
   test:assert-same-values(

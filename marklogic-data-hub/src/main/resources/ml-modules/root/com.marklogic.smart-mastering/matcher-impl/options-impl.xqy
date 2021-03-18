@@ -11,8 +11,8 @@ xquery version "1.0-ml";
 module namespace opt-impl = "http://marklogic.com/smart-mastering/options-impl";
 
 import module namespace algorithms = "http://marklogic.com/smart-mastering/algorithms"
-  at  "/com.marklogic.smart-mastering/algorithms/base.xqy",
-    "/com.marklogic.smart-mastering/algorithms/standard-reduction.xqy";
+  at "/com.marklogic.smart-mastering/algorithms/base.xqy",
+     "/com.marklogic.smart-mastering/algorithms/standard-reduction.xqy";
 import module namespace coll = "http://marklogic.com/smart-mastering/collections"
   at "/com.marklogic.smart-mastering/impl/collections.xqy";
 import module namespace config = "http://marklogic.com/data-hub/config"
@@ -23,7 +23,7 @@ import module namespace es-helper = "http://marklogic.com/smart-mastering/entity
   at "/com.marklogic.smart-mastering/sm-entity-services.xqy";
 import module namespace helper-impl = "http://marklogic.com/smart-mastering/helper-impl"
   at "/com.marklogic.smart-mastering/matcher-impl/helper-impl.xqy";
-import module namespace json="http://marklogic.com/xdmp/json"
+import module namespace json = "http://marklogic.com/xdmp/json"
   at "/MarkLogic/json/json.xqy";
 import module namespace util-impl = "http://marklogic.com/smart-mastering/util-impl"
   at "/com.marklogic.smart-mastering/impl/util.xqy";
@@ -64,7 +64,7 @@ declare function opt-impl:get-option-names-as-xml()
   let $option-names := $options !
     fn:replace(
       fn:replace(., $ALGORITHM-OPTIONS-DIR, ""),
-      "\.xml$", ""
+      "\.json", ""
     )
   return
     element matcher:options {
@@ -86,7 +86,7 @@ declare function opt-impl:option-names-json-config()
 {
   let $config := json:config("custom")
   return (
-    map:put($config, "array-element-names", ("option","content")),
+    map:put($config, "array-element-names", ("option", "content")),
     map:put($config, "element-namespace", "http://marklogic.com/smart-mastering/matcher"),
     map:put($config, "element-namespace-prefix", "matcher"),
     $config
@@ -105,20 +105,13 @@ declare function opt-impl:option-names-to-json($options-xml)
   else ()
 };
 
-declare function opt-impl:get-options-as-xml($options-name as xs:string)
-{
-  fn:doc($ALGORITHM-OPTIONS-DIR||$options-name||".xml")/matcher:options
-};
-
-declare function opt-impl:get-options-as-json($options-name as xs:string)
+declare function opt-impl:get-json-options($options-name as xs:string)
   as object-node()?
 {
-  opt-impl:options-to-json(
-    fn:doc($ALGORITHM-OPTIONS-DIR||$options-name||".xml")/matcher:options
-  )
+  fn:doc($ALGORITHM-OPTIONS-DIR || $options-name || ".json")/object-node()
 };
 
-declare function opt-impl:save-options(
+declare function opt-impl:save-json-options(
   $name as xs:string,
   $options as node()
 )
@@ -128,25 +121,26 @@ declare function opt-impl:save-options(
       $options/node()
     else
       $options
-  let $options :=
-    if ($options instance of object-node()) then
-      opt-impl:options-from-json($options)
-    else
-      $options
-  return (
-    algorithms:setup-algorithms($options/(self::*:options|*:options)),
+  let $_ :=
+    algorithms:setup-map-from-map(
+      algorithms:build-algorithms-map($options/matchRulesets/matchRules)
+    )
+  return
     xdmp:document-insert(
-      $ALGORITHM-OPTIONS-DIR||$name||".xml",
+      $ALGORITHM-OPTIONS-DIR || $name || ".json",
       $options,
       config:get-default-data-hub-permissions(),
       ($const:OPTIONS-COLL, $const:MATCH-OPTIONS-COLL, $const:ALGORITHM-COLL)
     )
-  )
 };
 
 (: Convert JSON match options to XML :)
 declare function opt-impl:options-from-json($options-json)
 {
+(:
+fn:error((), "Don't call opt-impl:options-from-json($options-json)")
+,
+:)
   let $options-root :=
     if (fn:exists($options-json/options)) then
       $options-json/options
@@ -176,7 +170,7 @@ declare function opt-impl:options-from-json($options-json)
         else
           for $content in $options-root/collections/content
           return
-            element matcher:content {fn:string($content)}
+            element matcher:content { fn:string($content) }
       },
       element matcher:algorithms {
         for $algorithm in $options-root/(array-node("algorithms")/object-node()|algorithms/algorithm)
@@ -184,7 +178,7 @@ declare function opt-impl:options-from-json($options-json)
           element matcher:algorithm {
             attribute name { fn:string($algorithm/name) },
             if (fn:exists($algorithm/function)) then
-              attribute function {fn:string($algorithm/function) }
+              attribute function { fn:string($algorithm/function) }
             else (),
             if (fn:exists($algorithm/namespace)) then
               attribute {"namespace"} { fn:string($algorithm/namespace) }
@@ -203,7 +197,7 @@ declare function opt-impl:options-from-json($options-json)
           element matcher:action {
             attribute name { fn:string($action/name) },
             if (fn:exists($action/function)) then
-              attribute function {fn:string($action/function) }
+              attribute function { fn:string($action/function) }
             else (),
             if (fn:exists($action/namespace)) then
               attribute namespace { fn:string($action/namespace) }
@@ -221,7 +215,7 @@ declare function opt-impl:options-from-json($options-json)
         return
           element matcher:threshold {
             attribute label { fn:string($threshold/label) },
-            attribute above {fn:string($threshold/above) },
+            attribute above { fn:string($threshold/above) },
             if (fn:exists($threshold/action)) then
               attribute action { fn:string($threshold/action) }
             else (),
@@ -362,22 +356,26 @@ declare function opt-impl:compile-match-options(
   $original-match-options as item() (: as node()|json:object :),
   $original-minimum-threshold as xs:double?,
   $only-warn-on-error as xs:boolean
-) {
-    let $match-options := if ($original-match-options instance of json:object) then
-        xdmp:to-json($original-match-options)/object-node()
-      else
-        $original-match-options
-    let $match-options := if (fn:exists($match-options/(*:options|matchOptions))) then
-        $match-options/(*:options|matchOptions)
-      else
-        $match-options
+)
+{
+  let $match-options :=
+    if ($original-match-options instance of json:object) then
+      xdmp:to-json($original-match-options)/object-node()
+    else
+      $original-match-options
+  let $match-options :=
+    if (fn:exists($match-options/(*:options|matchOptions))) then
+      $match-options/(*:options|matchOptions)
+    else
+      $match-options
   let $options-id := xdmp:md5(xdmp:describe($match-options, (), ()))
   let $cache-id := $options-id || "|min-threshold:" || $original-minimum-threshold
   return
   if (map:contains($_cached-compiled-match-options, $cache-id)) then
     map:get($_cached-compiled-match-options, $cache-id)
   else
-    let $_trace := if (xdmp:trace-enabled($const:TRACE-MATCH-RESULTS)) then
+    let $_trace :=
+      if (xdmp:trace-enabled($const:TRACE-MATCH-RESULTS)) then
         xdmp:trace($const:TRACE-MATCH-RESULTS, "compiling match options: " || xdmp:to-json-string($match-options))
       else
         ()
@@ -385,14 +383,18 @@ declare function opt-impl:compile-match-options(
       if ($only-warn-on-error) then
         map:map()
       else ()
+    let $log := xdmp:log("before normalize thresholds")
+    let $log := xdmp:log($match-options)
+    let $normalized-thresholds := opt-impl:normalize-thresholds($match-options/thresholds, $match-options)
+    let $log := xdmp:log("normalized-thresholds: " || xdmp:describe($normalized-thresholds, (), ()))
     let $ordered-thresholds :=
-      for $threshold in opt-impl:normalize-thresholds($match-options/*:thresholds, $match-options)
+      for $threshold in $normalized-thresholds
       order by $threshold/score cast as xs:decimal descending
       return $threshold
     let $lowest-threshold-score := fn:head(fn:reverse($ordered-thresholds))/score
     let $minimum-threshold as xs:double :=
       if (fn:empty($original-minimum-threshold)) then
-        fn:head(($lowest-threshold-score,1))
+        fn:head(($lowest-threshold-score, 1))
       else
         $original-minimum-threshold
     let $target-entity-type-info := util-impl:get-entity-type-information($match-options)
@@ -400,12 +402,13 @@ declare function opt-impl:compile-match-options(
     let $target-entity-type-def := $target-entity-type-info => map:get("targetEntityTypeDefinition")
     let $match-rulesets := $match-options/(*:scoring|matchRulesets)/(*:add|*:expand|*:reduce[fn:empty(parent::matchRulesets)]|self::matchRulesets)
     let $max-property-score := fn:max(($match-rulesets/(@weight|weight) ! fn:number(.)))
-    let $algorithms := algorithms:build-algorithms-map((
-      (: old algorithm format :)
-      $match-options/*:algorithms/*:algorithm,
-      (: new algorithm format :)
-      $match-rulesets/matchRules[matchType eq "custom"]
-    ))
+    let $algorithms :=
+      algorithms:build-algorithms-map((
+        (: old algorithm format :)
+        $match-options/*:algorithms/*:algorithm,
+        (: new algorithm format :)
+        $match-rulesets/matchRules[matchType eq "custom"]
+      ))
     let $score-ratio :=
       if ($max-property-score le 64) then
         1.0
@@ -467,18 +470,29 @@ declare function opt-impl:compile-match-options(
                 helper-impl:property-name-to-query($match-options, $full-property-name)($values, $weight)
               }
             else if ($type = ("expand", "custom", $algorithm-ref)) then
+              let $log := xdmp:log("$type: " || $type)
               let $custom-algorithm := map:get($algorithms, $algorithm-ref)
-              let $algorithm := if (fn:empty($custom-algorithm)) then
+              let $log := xdmp:log("custom algorithm: " || xdmp:describe($custom-algorithm, (), ()))
+              let $algorithm :=
+                if (fn:empty($custom-algorithm)) then
                   algorithms:default-function-lookup($type, 3)
                 else
                   $custom-algorithm
+              let $log := xdmp:log("algorithm: " || xdmp:describe($algorithm, (), ()))
               return
                 if (fn:exists($algorithm)) then
                   let $converted-match-rule := opt-impl:convert-match-rule-for-custom-module($match-rule, $match-options, $custom-algorithm)
                   let $converted-match-options := opt-impl:convert-options-for-custom-module($match-options, $custom-algorithm)
                   return algorithms:execute-algorithm($algorithm, ?, $converted-match-rule, $converted-match-options)
                 else
+                (
+                  xdmp:log("Before Function for the match query not found message"),
+                  xdmp:log($match-rule),
+                  xdmp:log("$algorithm-ref: " || $algorithm-ref),
+                  xdmp:log("$algorithms:"),
+                  xdmp:log($algorithms),
                   util-impl:handle-option-messages("error", "Function for the match query not found:" || fn:string($algorithm-ref), $message-output)
+                )
             else if ($type eq "reduce") then
               let $algorithm := $algorithm-ref ! map:get($algorithms, .)
               return
@@ -530,7 +544,8 @@ declare function opt-impl:compile-match-options(
           $minimum-threshold-positive-combination
             => map:with("notQueries", $negative-combinations)
 
-    let $compiled-match-options := map:new((
+    let $compiled-match-options :=
+      map:new((
         if (fn:exists($match-options/(dataFormat|matcher:data-format))) then
           map:entry("dataFormat", fn:string($match-options/(dataFormat|matcher:data-format)))
         else (),
@@ -681,29 +696,36 @@ declare function opt-impl:multi-struct-prop-multi-value-map($match-rules, $entit
           ()
 };
 
-declare function opt-impl:normalize-thresholds($thresholds as node()*, $match-options as node()) {
+declare function opt-impl:normalize-thresholds($thresholds as object-node()*, $match-options as node())
+  as object-node()*
+{
+  xdmp:log("in normalize-thresholds"),
+  xdmp:log($thresholds),
+
   if (fn:exists($thresholds[thresholdName])) then
     $thresholds
   else
-    for $threshold in $thresholds/*:threshold
-    let $action := fn:string($threshold/(@action|*:action))
+    let $thresholds := $thresholds ! (if (./threshold) then ./threshold else .)
+    for $threshold in $thresholds
+    let $action := fn:string($threshold/action)
     let $action-details :=
       if ($action = ("notify", "merge")) then
         ()
       else
-        $match-options/*:actions/*:action[(@name|name) = $action]
-    return xdmp:to-json(
+        $match-options/actions/action[name = $action]
+    return
+      xdmp:to-json(
         map:new((
-          map:entry("thresholdName", fn:string($threshold/(@label|*:label))),
-          map:entry("score", fn:number($threshold/(@above|*:above))),
+          map:entry("thresholdName", fn:string($threshold/label)),
+          map:entry("score", fn:number($threshold/above)),
           if (fn:exists($action-details)) then (
             map:entry("action", "custom"),
-            map:entry("actionModulePath", fn:string($action-details/(@at|at))),
-            map:entry("actionModuleNamespace", fn:string($action-details/(@namespace|namespace))),
-            map:entry("actionModuleFunction", fn:string($action-details/(@function|function)))
-          ) else (
-            map:entry("action", $action)
+            map:entry("actionModulePath", fn:string($action-details/at)),
+            map:entry("actionModuleNamespace", fn:string($action-details/namespace)),
+            map:entry("actionModuleFunction", fn:string($action-details/function))
           )
+          else
+            map:entry("action", $action)
         ))
       )/object-node()
 };

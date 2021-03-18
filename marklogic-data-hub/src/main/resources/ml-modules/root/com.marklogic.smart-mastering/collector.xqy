@@ -24,7 +24,7 @@ declare function plugin:collect(
   $options as map:map) as xs:string*
 {
   let $merge-options := merging:get-JSON-options($options => map:get("options"))
-  let $matching-options := matcher:get-options(fn:string($merge-options => map:get("matchOptions"), $const:FORMAT-XML)
+  let $matching-options := matcher:get-options(fn:string($merge-options => map:get("matchOptions"))
   return
     cts:uris((), (), cts:and-query((
       coll:content-collections($matching-options) ! cts:collection-query(.),

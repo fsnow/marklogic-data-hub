@@ -101,7 +101,7 @@ declare option xdmp:mapping "false";
  :)
 
 let $doc := fn:doc($lib:URI2)
-let $options := matcher:get-options($lib:MATCH-OPTIONS-NAME, $const:FORMAT-XML)
+let $options := matcher:get-options($lib:MATCH-OPTIONS-NAME)
 return (
   (: test page length gt # of results :)
   let $actual := matcher:find-document-matches-by-options($doc, $options, 1, 6, fn:true(), cts:true-query())

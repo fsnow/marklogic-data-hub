@@ -9,4 +9,4 @@ import module namespace test = "http://marklogic.com/test" at "/test/test-helper
 
 declare option xdmp:mapping "false";
 
-matcher:save-options("match-options", test:get-test-file("match-options.json")/node())
+matcher:save-json-options("match-options", test:get-test-file("match-options.json")/node())

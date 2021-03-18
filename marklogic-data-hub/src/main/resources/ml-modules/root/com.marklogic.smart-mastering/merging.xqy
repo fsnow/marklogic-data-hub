@@ -52,6 +52,7 @@ declare function merging:build-merge-models-by-uri(
 
 (:
  : Construct and store a merged document.
+ : (FSnow 3/3/21: Called only by rollback-merge and tests)
  :
  : @param $uris  the URIs of the documents to be merged
  : @param $merge-options  XML or JSON merge options to control how properties are combined.
@@ -137,6 +138,11 @@ declare function merging:get-JSON-options()
   impl:get-JSON-options()
 };
 
+(: call from JavaScript as getJsonOptions() :)
+declare function merging:get-json-options()
+{
+  impl:get-JSON-options()
+};
 (:
  : Retrieve a named set of merge options from the DB, stored as JSON, returned as JSON.
  :
@@ -168,13 +174,21 @@ declare function merging:save-JSON-options(
   impl:save-JSON-options($name, $options)
 };
 
+declare function merging:save-json-options(
+  $name as xs:string,
+  $options as node()
+) as empty-sequence()
+{
+  impl:save-JSON-options($name, $options)
+};
+
 (:
  : Save a set of merging options to the database.
  : @param $name  the name under which the options are to be stored
  : @param $options  the options, either XML or JSON.
  : @return ()
  :)
-declare function merging:save-options(
+declare function merging:save-options-HIDE(
   $name as xs:string,
   $options as node()
 ) as empty-sequence()

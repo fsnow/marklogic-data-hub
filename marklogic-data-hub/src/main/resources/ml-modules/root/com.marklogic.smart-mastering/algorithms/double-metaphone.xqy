@@ -44,7 +44,7 @@ declare
 {
   if (xdmp:trace-enabled($const:TRACE-MATCH-RESULTS)) then
     xdmp:trace($const:TRACE-MATCH-RESULTS, "doubleMetaphone algorithm called with " ||
-      xdmp:describe(("$expand-values",$expand-values ! fn:string(.), "$expand", $expand, "$options", $options), (), ())
+      xdmp:describe(("$expand-values", $expand-values ! fn:string(.), "$expand", $expand, "$options", $options), (), ())
     )
   else (),
   let $property-name := helper-impl:get-property-name($expand)
@@ -62,7 +62,7 @@ declare
   let $_ := xdmp:trace($const:TRACE-MATCH-RESULTS, "doubleMetaphone algorithm using dictionary '" || $dictionary || "'")
   where fn:exists($dictionary)
   return
-    let $weight := $expand/(weight|@weight)
+    let $weight := $expand/weight
     let $expanded-values :=
       for $value in $expand-values
       where $value castable as xs:string
@@ -86,6 +86,8 @@ declare function algorithms:doubleMetaphone(
 
 declare variable $dictionaries-inserted-in-transaction as map:map := map:map();
 
+
+(: TODO: needs to be updated, only supports XML options :)
 declare function algorithms:setup-double-metaphone($expand-xml, $options-xml, $options)
 {
   let $property-name := $expand-xml/@property-name

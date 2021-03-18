@@ -1,0 +1,90 @@
+{
+  "options": {
+    "thresholds": [
+      {
+        "above": "1",
+        "label": "Possible Match"
+      },
+      {
+        "above": "50",
+        "label": "Likely Match",
+        "action": "notify"
+      },
+      {
+        "above": "75",
+        "label": "Definitive Match",
+        "action": "merge"
+      }
+    ],
+    "tuning": {
+      "maxScan": "200"
+    },
+    "propertyDefs": {
+      "properties": [
+        {
+          "namespace": "",
+          "localname": "IdentificationID",
+          "name": "ssn"
+        },
+        {
+          "namespace": "",
+          "localname": "PersonGivenName",
+          "name": "first-name"
+        },
+        {
+          "namespace": "",
+          "localname": "PersonSurName",
+          "name": "last-name"
+        },
+        {
+          "namespace": "",
+          "localname": "AddressPrivateMailboxText",
+          "name": "addr1"
+        },
+        {
+          "namespace": "",
+          "localname": "LocationCity",
+          "name": "city"
+        },
+        {
+          "namespace": "",
+          "localname": "LocationState",
+          "name": "state"
+        },
+        {
+          "namespace": "",
+          "localname": "LocationPostalCode",
+          "name": "zip"
+        },
+        {
+          "namespace": "",
+          "localname": "Revenue",
+          "name": "revenue"
+        }
+      ]
+    },
+    "algorithms": [
+      {
+        "function": "standard-reduction",
+        "name": "std-reduce"
+      },
+      {
+        "function": "standard-reduction-query",
+        "name": "std-reduce-query"
+      },
+      {
+        "function": "double-metaphone",
+        "name": "dbl-metaphone"
+      }
+    ],
+    "actions": [],
+    "scoring": {
+      "add": [
+        {
+          "propertyName": "state",
+          "weight": "1"
+        }
+      ]
+    }
+  }
+}

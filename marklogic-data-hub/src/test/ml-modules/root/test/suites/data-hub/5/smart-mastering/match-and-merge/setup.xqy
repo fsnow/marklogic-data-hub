@@ -7,7 +7,7 @@ import module namespace test = "http://marklogic.com/test" at "/test/test-helper
 
 declare option xdmp:mapping "false";
 
-matcher:save-options($lib:MATCH-OPTIONS-NAME, test:get-test-file("match-options.xml"))
+matcher:save-json-options($lib:MATCH-OPTIONS-NAME, test:get-test-file("match-options.json"))
 
 ;
 
@@ -45,3 +45,11 @@ return
     (xdmp:default-permissions(), xdmp:permission('data-hub-common','read'), xdmp:permission('data-hub-common','update')),
     "datahubMasteringMatchSummary"
   )
+
+;
+
+xquery version "1.0-ml";
+import module namespace spell = "http://marklogic.com/xdmp/spell"
+    at "/MarkLogic/spell.xqy";
+
+spell:insert("name-dictionary.xml", <dictionary xmlns="http://marklogic.com/xdmp/spell"/>)

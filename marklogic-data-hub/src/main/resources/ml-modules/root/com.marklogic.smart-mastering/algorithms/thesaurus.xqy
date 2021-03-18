@@ -37,7 +37,7 @@ declare function algorithms:thesaurus(
     let $entries := thsr:lookup($thesaurus, fn:lower-case(fn:string($value)))
     where fn:exists($entries)
     return
-      let $weight := $expand/(@weight|weight)
+      let $weight := $expand/weight
       let $query := helper-impl:property-name-to-query($options, $property-name)(fn:lower-case($value), $weight)
       return expand-query($query, $entries, $expand)
 };

@@ -12,7 +12,7 @@ import module namespace lib = "http://marklogic.com/smart-mastering/test" at "li
 import module namespace test = "http://marklogic.com/test" at "/test/test-helper.xqy";
 
 declare option xdmp:mapping "false";
-matcher:save-options($lib:MATCH-OPTIONS-NAME, test:get-test-file("match-options.xml"))
+matcher:save-json-options($lib:MATCH-OPTIONS-NAME, test:get-test-file("match-options.json"))
 
 ;
 
@@ -33,9 +33,9 @@ declare variable $module-permissions := (
 
 declare option xdmp:mapping "false";
 
-matcher:save-options($lib:NAMESPACED-MATCH-OPTIONS-NAME, test:get-test-file("namespaced-match-options.xml")),
-matcher:save-options($lib:SCORE-OPTIONS-NAME, test:get-test-file("scoring-options.xml")),
-matcher:save-options($lib:SCORE-OPTIONS-NAME2, test:get-test-file("scoring-options2.xml")),
+matcher:save-json-options($lib:NAMESPACED-MATCH-OPTIONS-NAME, test:get-test-file("namespaced-match-options.json")),
+matcher:save-json-options($lib:SCORE-OPTIONS-NAME, test:get-test-file("scoring-options.json")),
+matcher:save-json-options($lib:SCORE-OPTIONS-NAME2, test:get-test-file("scoring-options2.json")),
 
 for $uri in map:keys($lib:TEST-DATA)
 let $doc := test:get-test-file(map:get($lib:TEST-DATA, $uri))
@@ -49,3 +49,11 @@ return
 
 ,
 test:load-test-file("custom-xqy-matching-algo-dob.xqy", xdmp:modules-database(), "/custom-xqy-matching-algo-dob.xqy", $module-permissions)
+
+;
+
+xquery version "1.0-ml";
+import module namespace spell = "http://marklogic.com/xdmp/spell"
+    at "/MarkLogic/spell.xqy";
+
+spell:insert("name-dictionary.xml", <dictionary xmlns="http://marklogic.com/xdmp/spell"/>)

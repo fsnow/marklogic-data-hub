@@ -1,0 +1,101 @@
+{
+  "options": {
+    "matchRulesets": [
+      {
+        "name": "ssn - Exact",
+        "weight": 50,
+        "matchRules": [
+          {
+            "entityPropertyPath": "ssn",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "last-name - Exact",
+        "weight": 8,
+        "matchRules": [
+          {
+            "entityPropertyPath": "last-name",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "first-name - Exact",
+        "weight": 12,
+        "matchRules": [
+          {
+            "entityPropertyPath": "first-name",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "addr1 - Exact",
+        "weight": 5,
+        "matchRules": [
+          {
+            "entityPropertyPath": "addr1",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "city - Exact",
+        "weight": 3,
+        "matchRules": [
+          {
+            "entityPropertyPath": "city",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "state - Exact",
+        "weight": 1,
+        "matchRules": [
+          {
+            "entityPropertyPath": "state",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "zip - Exact",
+        "weight": 3,
+        "matchRules": [
+          {
+            "entityPropertyPath": "zip",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      },
+      {
+        "name": "last-name,addr1 - Reduce",
+        "weight": 4,
+        "reduce": true,
+        "matchRules": [
+          {
+            "entityPropertyPath": "last-name",
+            "matchType": "exact",
+            "options": {}
+          },
+          {
+            "entityPropertyPath": "addr1",
+            "matchType": "exact",
+            "options": {}
+          }
+        ]
+      }
+    ],
+    "thresholds": []
+  }
+}

@@ -11,7 +11,7 @@ import module namespace test = "http://marklogic.com/test" at "/test/test-helper
 
 declare option xdmp:mapping "false";
 
-matcher:save-options($lib:MATCH-OPTIONS-NAME, test:get-test-file("match-options.xml")),
+matcher:save-json-options($lib:MATCH-OPTIONS-NAME, test:get-test-file("match-options.json")),
 merging:save-JSON-options($lib:MERGE-OPTIONS-NAME, test:get-test-file("merge-options.json")),
 
 for $uri in map:keys($lib:TEST-DATA)

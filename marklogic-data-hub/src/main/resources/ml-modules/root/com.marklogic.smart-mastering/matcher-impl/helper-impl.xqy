@@ -21,6 +21,10 @@ declare variable $_cached-property-name-to-queries as map:map := map:map();
 
 declare function helper-impl:property-name-to-query($match-options as item(), $full-property-name as xs:string)
 {
+let $log := xdmp:log("in property-name-to-query")
+let $log := xdmp:log($match-options)
+let $log := xdmp:log("after match options")
+
   let $compiled-match-options := match-opt-impl:compile-match-options($match-options, ())
   let $match-options := $compiled-match-options => map:get("normalizedOptions")
   let $options-id := $compiled-match-options => map:get("optionsId")
@@ -37,7 +41,7 @@ declare function helper-impl:property-name-to-query($match-options as item(), $f
           es-helper:get-entity-property-info($target-entity-type, $full-property-name)
         else
           ()
-      let $property-def := $match-options/(*:property-defs|propertyDefs)/*:property[(name|@name) = $full-property-name]
+      let $property-def := $match-options/propertyDefs/(property|properties)[name = $full-property-name]
       let $index-reference-info := $property-def/(cts:json-property-reference|cts:element-reference|cts:path-reference|cts:field-reference|indexReferences)
       let $index-references := ($property-info ! map:get(., "indexReference"), $index-reference-info ! cts:reference-parse(.))
       let $helper-query :=
@@ -111,7 +115,7 @@ declare function helper-impl:property-name-to-query($match-options as item(), $f
                     $weight
                 )
             }
-        else ()
+        else xdmp:log("final else case")
       return (
         map:put($_cached-property-name-to-queries, $key, $helper-query),
         $helper-query,
@@ -132,16 +136,19 @@ declare function helper-impl:property-name-to-qname($match-options as item(), $f
     else
       let $target-entity-type := $compiled-match-options => map:get("targetEntityType")
       let $property-info := es-helper:get-entity-property-info($target-entity-type, $full-property-name)
+      let $log := xdmp:log("in property-name-to-qname, full-property-name: " || $full-property-name)
+      let $log := xdmp:log($property-info)
+      let $log := xdmp:log("after property-info")
       let $qname :=
         if (fn:exists($property-info)) then
           let $namespace := fn:string($property-info => map:get("namespace"))
           return fn:QName($namespace, helper-impl:NCName-compatible($property-info => map:get("propertyTitle")))
         else
-          let $property-def := $match-options/(*:property-defs|propertyDefs)/*:property[(name|@name) = $full-property-name]
-          return
-            fn:QName(fn:string($property-def/(@namespace|namespace)), fn:string($property-def/(@localname|localname)))
+          let $property-def := $match-options/propertyDefs/(property|properties)[(name) = $full-property-name]
+          return fn:QName(fn:string($property-def/namespace), fn:string($property-def/localname))
       return (
         map:put($_cached-property-name-to-qnames, $key, $qname),
+        xdmp:log("in property-name-to-qname, qname: " || $qname),
         $qname
       )
 };
